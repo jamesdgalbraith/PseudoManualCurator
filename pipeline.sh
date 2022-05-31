@@ -58,7 +58,7 @@ cd-hit-est -n 10 -c 0.95 -i ${RM_LIBRARY} -o data/clustered_${RM_LIBRARY_NAME} #
 
 Rscript splitter.R -t nt -f data/clustered_${RM_LIBRARY_NAME} -o data/split/ -p 128 # split query
 
-ls data/split/clustered_${RM_LIBRARY_NAME}.* | sed 's/.*\///' > data/queries.txt # list queries
+ls data/split/clustered_${RM_LIBRARY_NAME}* | sed 's/.*\///' > data/queries.txt # list queries
 
 if [ ! -f "${GENOME}".nsq ]; then
   makeblastdb -in ${GENOME} -dbtype nucl -out ${GENOME} # makeblastb if needed
@@ -70,7 +70,7 @@ cat data/initial_search/clustered_${RM_LIBRARY_NAME}_seq_*.fasta.out > data/${GE
 
 Rscript self_blast_setup.R -g ${GENOME} -l ${RM_LIBRARY} # extend seqs
 
-ls data/initial_seq/${GENOME_NAME}*.fasta | sed 's/.*\///' > data/${GENOME_NAME}_self_queries.txt
+ls data/initial_seq/${GENOME_NAME}*fasta | sed 's/.*\///' > data/${GENOME_NAME}_self_queries.txt
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_self_queries.txt" blastn -task dc-megablast -query data/initial_seq/{} -subject data/initial_seq/{} -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/self_search/{}.out -num_threads 1 # self blast
 
@@ -92,7 +92,7 @@ cat data/initial_search/needs_rewash_${GENOME_NAME}_seq_*.fasta.out > data/${GEN
 
 Rscript rewash_self_blast_setup.R -g ${GENOME} -l data/needs_rewash_${GENOME_NAME} # extend seqs
 
-ls data/initial_seq/rewash_${GENOME_NAME}*.fasta | sed 's/.*\///' > data/rewash_${GENOME_NAME}_self_queries.txt
+ls data/initial_seq/rewash_${GENOME_NAME}*fasta | sed 's/.*\///' > data/rewash_${GENOME_NAME}_self_queries.txt
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/rewash_${GENOME_NAME}"_self_queries.txt" blastn -task dc-megablast -query data/initial_seq/{} -subject data/initial_seq/{} -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/self_search/{}.out -num_threads 1 # self blast
 
