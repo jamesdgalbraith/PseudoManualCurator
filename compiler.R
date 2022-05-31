@@ -28,7 +28,7 @@ suppressPackageStartupMessages({
 })
 
 # determine new sequences to be read in
-to_read <- read_tsv(paste0("out/", opt$genome_name, "_to_align.txt"), col_names = F)
+to_read <- read_tsv(paste0("data/", opt$genome_name, "_to_align.txt"), col_names = F)
 
 # read in clustered seq
 clustered_seq <- readDNAStringSet(paste0("data/clustered_", opt$genome_name))
@@ -39,8 +39,8 @@ new_consensuses <- DNAStringSet()
 
 # read in new sequences and compile
 for (i in 1:nrow(to_read)) {
-  if(file.exists(paste0("out/CIAlign/", to_read$X1[i], "_consensus.fasta"))){
-    new_consensuses <- c(new_consensuses, readDNAStringSet(paste0("out/CIAlign/", to_read$X1[i], "_consensus.fasta")))
+  if(file.exists(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta"))){
+    new_consensuses <- c(new_consensuses, readDNAStringSet(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta")))
   }
 }
 
@@ -60,9 +60,9 @@ to_rerun <-
 # compile completed (not to rerun) and not improved seq
 not_improved_seq <- clustered_seq[!names(clustered_seq) %in% names(new_consensuses)]
 completed_seq <- new_consensuses[!names(new_consensuses) %in% to_rerun$seqnames]
-writeXStringSet(x = c(not_improved_seq, completed_seq), filepath = paste0("out/wash_1_", opt$genome_name))
+writeXStringSet(x = c(not_improved_seq, completed_seq), filepath = paste0("data/wash_1_", opt$genome_name))
 
 # get sequences to rewash
 to_rerun_seq <- new_consensuses[names(new_consensuses) %in% to_rerun$seqnames]
-writeXStringSet(to_rerun_seq, paste0("out/needs_rewash_", opt$genome_name))
+writeXStringSet(to_rerun_seq, paste0("data/needs_rewash_", opt$genome_name))
 

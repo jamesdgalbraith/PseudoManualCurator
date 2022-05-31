@@ -49,7 +49,7 @@ fi
 GENOME_NAME=$( echo $GENOME | sed 's/.*\///' )
 RM_LIBRARY_NAME=$( echo $GENOME | sed 's/.*\///' )
 
-mkdir -p data/split out/initial_search/ out/self_search/ out/to_align/ out/mafft/
+mkdir -p data/split data/initial_search/ data/self_search/ data/to_align/ data/mafft/
 
 export GENOME
 export THREADS
@@ -64,42 +64,42 @@ if [ ! -f "${GENOME}".nsq ]; then
   makeblastdb -in ${GENOME} -dbtype nucl -out ${GENOME} # makeblastb if needed
 fi
 
-parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/queries.txt blastn -task dc-megablast -query data/split/{} -db $GENOME -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out out/initial_search/{}.out -num_threads 1 # search genome
+parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/queries.txt blastn -task dc-megablast -query data/split/{} -db $GENOME -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/initial_search/{}.out -num_threads 1 # search genome
  
-cat out/initial_search/clustered_${RM_LIBRARY_NAME}_seq_*.fasta.out > out/${GENOME_NAME}_initial_search.out # compile data
+cat data/initial_search/clustered_${RM_LIBRARY_NAME}_seq_*.fasta.out > data/${GENOME_NAME}_initial_search.out # compile data
 
 Rscript self_blast_setup.R -g ${GENOME} -l ${RM_LIBRARY} # extend seqs
 
-ls out/initial_seq/${GENOME_NAME}*.fasta | sed 's/.*\///' > out/${GENOME_NAME}_self_queries.txt
+ls data/initial_seq/${GENOME_NAME}*.fasta | sed 's/.*\///' > data/${GENOME_NAME}_self_queries.txt
 
-parallel --env GENOME_NAME --bar --jobs ${THREADS} -a out/${GENOME_NAME}"_self_queries.txt" blastn -task dc-megablast -query out/initial_seq/{} -subject out/initial_seq/{} -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out out/self_search/{}.out -num_threads 1 # self blast
+parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_self_queries.txt" blastn -task dc-megablast -query data/initial_seq/{} -subject data/initial_seq/{} -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/self_search/{}.out -num_threads 1 # self blast
 
 Rscript mafft_setup.R -g ${GENOME_NAME} # trim seqs pre-mafft
 
-parallel --env GENOME_NAME --bar --jobs 1 -a out/${GENOME_NAME}"_to_align.txt" echo "mafft --thread $THREADS --localpair --adjustdirectionaccurately out/to_align/{} out/mafft/{}"
+parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_align.txt" echo "mafft --thread $THREADS --localpair --adjustdirectionaccurately data/to_align/{} data/mafft/{}"
 
-parallel --env GENOME_NAME --bar --jobs ${THREADS} -a out/${GENOME_NAME}"_to_align.txt" CIAlign --infile out/mafft/{} --outfile_stem out/CIAlign/{} --crop_ends --make_consensus --consensus_name {}
+parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_align.txt" CIAlign --infile data/mafft/{} --outfile_stem data/CIAlign/{} --crop_ends --make_consensus --consensus_name {}
 
 Rscript compiler.R -g ${GENOME}
 
-Rscript splitter.R -t nt -f out/needs_rewash_${GENOME_NAME} -o data/split/ -p 128 # split query
+Rscript splitter.R -t nt -f data/needs_rewash_${GENOME_NAME} -o data/split/ -p 128 # split query
 
 ls data/split/needs_rewash_${GENOME_NAME}* | sed 's/.*\///' > data/rewash_queries_${GENOME_NAME}.txt # list queries
 
-parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/"rewash_queries_"${GENOME_NAME}".txt" blastn -task dc-megablast -query data/split/{} -db $GENOME -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out out/initial_search/{}.out -num_threads 1 # search genome
+parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/"rewash_queries_"${GENOME_NAME}".txt" blastn -task dc-megablast -query data/split/{} -db $GENOME -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/initial_search/{}.out -num_threads 1 # search genome
  
-cat out/initial_search/needs_rewash_${GENOME_NAME}_seq_*.fasta.out > out/${GENOME_NAME}_rewash_search.out # compile data
+cat data/initial_search/needs_rewash_${GENOME_NAME}_seq_*.fasta.out > data/${GENOME_NAME}_rewash_search.out # compile data
 
-Rscript rewash_self_blast_setup.R -g ${GENOME} -l out/needs_rewash_${GENOME_NAME} # extend seqs
+Rscript rewash_self_blast_setup.R -g ${GENOME} -l data/needs_rewash_${GENOME_NAME} # extend seqs
 
-ls out/initial_seq/rewash_${GENOME_NAME}*.fasta | sed 's/.*\///' > out/rewash_${GENOME_NAME}_self_queries.txt
+ls data/initial_seq/rewash_${GENOME_NAME}*.fasta | sed 's/.*\///' > data/rewash_${GENOME_NAME}_self_queries.txt
 
-parallel --env GENOME_NAME --bar --jobs ${THREADS} -a out/rewash_${GENOME_NAME}"_self_queries.txt" blastn -task dc-megablast -query out/initial_seq/{} -subject out/initial_seq/{} -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out out/self_search/{}.out -num_threads 1 # self blast
+parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/rewash_${GENOME_NAME}"_self_queries.txt" blastn -task dc-megablast -query data/initial_seq/{} -subject data/initial_seq/{} -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/self_search/{}.out -num_threads 1 # self blast
 
 Rscript rewash_mafft_setup.R -g ${GENOME_NAME} # trim seqs pre-mafft
 
-parallel --env GENOME_NAME --bar --jobs 1 -a out/${GENOME_NAME}"_to_rewash_align.txt" "mafft --thread $THREADS --localpair --adjustdirectionaccurately out/to_align/{} > out/mafft/{}" # align
+parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_rewash_align.txt" "mafft --thread $THREADS --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}" # align
 
-parallel --env GENOME_NAME --bar --jobs ${THREADS} -a out/${GENOME_NAME}"_to_rewash_align.txt" CIAlign --infile out/mafft/{} --outfile_stem out/CIAlign/{} --crop_ends --make_consensus --consensus_name {} #trim and consensus
+parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_rewash_align.txt" CIAlign --infile data/mafft/{} --outfile_stem data/CIAlign/{} --crop_ends --make_consensus --consensus_name {} #trim and consensus
 
 Rscript final_spin.R -g ${GENOME} -l ${RM_LIBRARY} # compile all together

@@ -32,7 +32,7 @@ suppressPackageStartupMessages({
 flank5 = 1500
 flank3 = 1500
 
-blast_out <- read_tsv(file = paste0("out/", opt$genome_name, "_rewash_search.out"),
+blast_out <- read_tsv(file = paste0("data/", opt$genome_name, "_rewash_search.out"),
                       col_names = c("qseqid", "seqnames", "pident", "length", "qstart", "qend",
                                     "qlen", "sstart", "send", "slen", "evalue", "bitscore"))
 
@@ -81,7 +81,7 @@ for(i in 1:length(blast_out_tbl$qseqid)){
   
   align_seq <- c(consensus_seq[names(consensus_seq) == blast_out_tbl$qseqid[i]], align_seq)
   
-  Biostrings::writeXStringSet(x = align_seq, filepath = paste0("out/initial_seq/rewash_", opt$genome_name, "_",
+  Biostrings::writeXStringSet(x = align_seq, filepath = paste0("data/initial_seq/rewash_", opt$genome_name, "_",
                                                                sub("#.*", "", blast_out_tbl$qseqid[i]), ".fasta"))
   
 }

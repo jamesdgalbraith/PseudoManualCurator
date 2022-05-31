@@ -36,25 +36,25 @@ suppressPackageStartupMessages({
   library(tidyverse)
 })
 
-first_washed <- readDNAStringSet(filepath = paste0("out/wash_1_", opt$genome_name))
+first_washed <- readDNAStringSet(filepath = paste0("data/wash_1_", opt$genome_name))
 
 # make empty holder to add new sequences to
 new_consensuses <- DNAStringSet()
 
-to_read <- read_tsv(paste0("out/", opt$genome_name, "_to_rewash_align.txt"), col_names = F, show_col_types = FALSE)
+to_read <- read_tsv(paste0("data/", opt$genome_name, "_to_rewash_align.txt"), col_names = F, show_col_types = FALSE)
 
-pre_rewash_seq <- readDNAStringSet(paste0("out/needs_rewash_", opt$genome_name))
+pre_rewash_seq <- readDNAStringSet(paste0("data/needs_rewash_", opt$genome_name))
 
 # read in new sequences and compile
 for (i in 1:nrow(to_read)) {
-  if(file.exists(paste0("out/CIAlign/", to_read$X1[i], "_consensus.fasta"))){
-    holding_seq <- readDNAStringSet(paste0("out/CIAlign/", to_read$X1[i], "_consensus.fasta"))
+  if(file.exists(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta"))){
+    holding_seq <- readDNAStringSet(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta"))
     # add old classification
     names(holding_seq) <- names(pre_rewash_seq[sub("#.*", "", names(pre_rewash_seq)) ==
                                                  sub(".fasta", "", sub("rewash_", "", to_read$X1[i]))])
     new_consensuses <- c(new_consensuses, holding_seq)
   } else { # no new consensus use old consensus
-    message(paste0("Could not locate out/CIAlign/", to_read$X1[i], "_consensus.fasta"))
+    message(paste0("Could not locate data/CIAlign/", to_read$X1[i], "_consensus.fasta"))
     holding_seq <- pre_rewash_seq[sub("#.*", "", names(pre_rewash_seq)) ==
                                     sub(".fasta", "", sub("rewash_", "", to_read$X1[i]))]
     new_consensuses <- c(new_consensuses, holding_seq)

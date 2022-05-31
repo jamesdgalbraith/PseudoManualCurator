@@ -30,16 +30,16 @@ suppressPackageStartupMessages({
 })
 
 # determine queries
-queries <- read_tsv(paste0("out/rewash_", opt$genome_name, "_self_queries.txt"), col_names = "qseqid", show_col_types = F)
+queries <- read_tsv(paste0("data/rewash_", opt$genome_name, "_self_queries.txt"), col_names = "qseqid", show_col_types = F)
 
 # make placeholder for files to align
 to_align <- tibble(query = character())
 
 for (i in 1:nrow(queries)) {
   
-  in_seq <- Biostrings::readDNAStringSet(filepath = paste0("out/initial_seq/", queries$qseqid[i])) # read in sequence
+  in_seq <- Biostrings::readDNAStringSet(filepath = paste0("data/initial_seq/", queries$qseqid[i])) # read in sequence
   
-  self_out <- read_tsv(file = paste0("out/self_search/", queries$qseqid[i], ".out"), # read in blast data
+  self_out <- read_tsv(file = paste0("data/self_search/", queries$qseqid[i], ".out"), # read in blast data
                        col_names = c("seqnames", "sseqid", "pident", "length", "qstart", "qend",
                                      "qlen", "sstart", "send", "slen", "evalue", "bitscore"), show_col_types = F) %>%
     filter(sseqid != seqnames) %>% # remove self hits
@@ -76,11 +76,11 @@ for (i in 1:nrow(queries)) {
   
   out_seq <- c(in_seq[1], out_seq) # add original sequence
   
-  writeXStringSet(out_seq, paste0("out/to_align/", sub(paste0(opt$genome_name, "_"), "", queries$qseqid[i]))) # write to file
+  writeXStringSet(out_seq, paste0("data/to_align/", sub(paste0(opt$genome_name, "_"), "", queries$qseqid[i]))) # write to file
   
   to_align <- rbind(to_align, tibble(query = sub(paste0(opt$genome_name, "_"), "", queries$qseqid[i])))
 
 }
 
 # write list of sequences to be aligned to file
-write_tsv(to_align, paste0("out/", opt$genome_name, "_to_rewash_align.txt"), col_names = F)
+write_tsv(to_align, paste0("data/", opt$genome_name, "_to_rewash_align.txt"), col_names = F)

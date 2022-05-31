@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
 flank5 = 1500
 flank3 = 1500
 
-blast_out <- read_tsv(file = paste0("out/", genome_name, "_initial_search.out"),
+blast_out <- read_tsv(file = paste0("data/", genome_name, "_initial_search.out"),
                       col_names = c("qseqid", "seqnames", "pident", "length", "qstart", "qend",
                                     "qlen", "sstart", "send", "slen", "evalue", "bitscore"))
 
@@ -73,7 +73,7 @@ names(genome_seq) <- sub(" .*", "", names(genome_seq))
 consensus_seq <- Biostrings::readDNAStringSet(filepath = opt$library)
 names(consensus_seq) <- sub(" .*", "", names(consensus_seq))
 
-if(!dir.exists("out/initial_seq/")){dir.create("out/initial_seq/")}
+if(!dir.exists("data/initial_seq/")){dir.create("data/initial_seq/")}
 
 for(i in 1:length(blast_out_tbl$qseqid)){
 
@@ -84,7 +84,7 @@ for(i in 1:length(blast_out_tbl$qseqid)){
   
   align_seq <- c(consensus_seq[names(consensus_seq) == blast_out_tbl$qseqid[i]], align_seq)
   
-  Biostrings::writeXStringSet(x = align_seq, filepath = paste0("out/initial_seq/", genome_name, "_",
+  Biostrings::writeXStringSet(x = align_seq, filepath = paste0("data/initial_seq/", genome_name, "_",
                                                                sub("#.*", "", blast_out_tbl$qseqid[i]), ".fasta"))
 
 }
