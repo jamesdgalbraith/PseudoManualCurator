@@ -56,7 +56,7 @@ export THREADS
 
 cd-hit-est -n 10 -c 0.95 -i ${RM_LIBRARY} -o data/clustered_${RM_LIBRARY_NAME} # cluster seq
 
-Rscript splitter.R -t nt -f data/clustered_${RM_LIBRARY_NAME} -o data/split/ -p 128 # split query
+Rscript splitter.R -t nt -f data/clustered_${RM_LIBRARY_NAME} -o data/split/ -p $(expr $THREADS \* 10) # split query
 
 ls data/split/clustered_${RM_LIBRARY_NAME}* | sed 's/.*\///' > data/queries.txt # list queries
 
@@ -82,7 +82,7 @@ parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_al
 
 Rscript compiler.R -g ${GENOME}
 
-Rscript splitter.R -t nt -f data/needs_rewash_${GENOME_NAME} -o data/split/ -p 128 # split query
+Rscript splitter.R -t nt -f data/needs_rewash_${GENOME_NAME} -o data/split/ -p $(expr $THREADS \* 10) # split query
 
 ls data/split/needs_rewash_${GENOME_NAME}* | sed 's/.*\///' > data/rewash_queries_${GENOME_NAME}.txt # list queries
 
