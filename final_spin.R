@@ -46,7 +46,7 @@ to_read <- read_tsv(paste0("data/", opt$genome_name, "_to_rewash_align.txt"), co
 pre_rewash_seq <- readDNAStringSet(paste0("data/needs_rewash_", opt$genome_name))
 
 # read in new sequences and compile
-for (i in 1:nrow(to_read)) {
+for (i in seq_along(to_read$X1)) {
   if(file.exists(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta"))){
     holding_seq <- readDNAStringSet(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta"))
     # add old classification

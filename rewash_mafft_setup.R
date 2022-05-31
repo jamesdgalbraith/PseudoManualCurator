@@ -35,7 +35,7 @@ queries <- read_tsv(paste0("data/rewash_", opt$genome_name, "_self_queries.txt")
 # make placeholder for files to align
 to_align <- tibble(query = character())
 
-for (i in 1:nrow(queries)) {
+for (i in seq_along(queries$qseqid)) {
   
   in_seq <- Biostrings::readDNAStringSet(filepath = paste0("data/initial_seq/", queries$qseqid[i])) # read in sequence
   

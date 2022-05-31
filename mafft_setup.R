@@ -6,15 +6,15 @@ suppressPackageStartupMessages({
 
 
 # parse input variables
-option_list = list(
+option_list <- list(
   make_option(c("-g", "--genome"), type="character", default=NULL,
               help="genome name", metavar="character"),
   make_option(c("-l", "--repeat_library"), type="character", default=NULL,
               help="genome name", metavar="character")
 )
 
-opt_parser = OptionParser(option_list=option_list)
-opt = parse_args(opt_parser)
+opt_parser <- OptionParser(option_list=option_list)
+opt <- parse_args(opt_parser)
 
 if (is.null(opt$genome)) {
   stop("Genome name is needed")
@@ -35,7 +35,7 @@ queries <- read_tsv(paste0("data/", opt$genome_name, "_self_queries.txt"), col_n
 # make placeholder for files to align
 to_align <- tibble(query = character())
 
-for (i in 1:nrow(queries)) {
+for (i in seq_along(queries$qseqid)) {
   
   in_seq <- Biostrings::readDNAStringSet(filepath = paste0("data/initial_seq/", queries$qseqid[i])) # read in sequence
   
@@ -84,6 +84,3 @@ for (i in 1:nrow(queries)) {
 
 # write list of sequences to be aligned to file
 write_tsv(to_align, paste0("data/", opt$genome_name, "_to_align.txt"), col_names = F)
-
-queries %>% mutate(n = 1:nrow(queries)) %>% filter(grepl("Echis_carinatus_rnd-6_family-77", qseqid))
-

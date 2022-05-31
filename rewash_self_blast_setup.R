@@ -72,7 +72,7 @@ names(genome_seq) <- sub(" .*", "", names(genome_seq))
 consensus_seq <- Biostrings::readDNAStringSet(filepath = opt$library)
 names(consensus_seq) <- sub(" .*", "", names(consensus_seq))
 
-for(i in 1:length(blast_out_tbl$qseqid)){
+for(i in seq_along(blast_out_tbl$qseqid)){
   
   align_ranges <- blast_out_merged[blast_out_merged$qseqid == blast_out_tbl$qseqid[i]]
   align_ranges <- GenomicRanges::reduce(align_ranges, ignore.strand=T)

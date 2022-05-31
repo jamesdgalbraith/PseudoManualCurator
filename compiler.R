@@ -38,7 +38,7 @@ names(clustered_seq) <- sub(" .*", "", names(clustered_seq))
 new_consensuses <- DNAStringSet()
 
 # read in new sequences and compile
-for (i in 1:nrow(to_read)) {
+for (i in seq_along(to_read$X1)) {
   if(file.exists(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta"))){
     new_consensuses <- c(new_consensuses, readDNAStringSet(paste0("data/CIAlign/", to_read$X1[i], "_consensus.fasta")))
   }

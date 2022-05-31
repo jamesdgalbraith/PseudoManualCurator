@@ -49,7 +49,7 @@ fi
 GENOME_NAME=$( echo $GENOME | sed 's/.*\///' )
 RM_LIBRARY_NAME=$( echo $GENOME | sed 's/.*\///' )
 
-mkdir -p data/split data/initial_search/ data/self_search/ data/to_align/ data/mafft/
+mkdir -p data/split data/initial_search/ data/self_search/ data/to_align/ data/mafft/ data/CIAlign/
 
 export GENOME
 export THREADS
@@ -76,7 +76,7 @@ parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_self_
 
 Rscript mafft_setup.R -g ${GENOME_NAME} # trim seqs pre-mafft
 
-parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_align.txt" "mafft --thread $THREADS --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}"
+parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_align.txt" "mafft --thread $THREADS --quiet --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}"
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_align.txt" CIAlign --infile data/mafft/{} --outfile_stem data/CIAlign/{} --crop_ends --make_consensus --consensus_name {}
 
@@ -98,7 +98,7 @@ parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/rewash_${GENOME_NAME}
 
 Rscript rewash_mafft_setup.R -g ${GENOME_NAME} # trim seqs pre-mafft
 
-parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_rewash_align.txt" "mafft --thread $THREADS --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}" # align
+parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_rewash_align.txt" "mafft --thread $THREADS --quiet --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}" # align
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_rewash_align.txt" CIAlign --infile data/mafft/{} --outfile_stem data/CIAlign/{} --crop_ends --make_consensus --consensus_name {} #trim and consensus
 
