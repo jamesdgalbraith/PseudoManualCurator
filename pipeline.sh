@@ -76,7 +76,7 @@ parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_self_
 
 Rscript mafft_setup.R -g ${GENOME_NAME} # trim seqs pre-mafft
 
-parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_align.txt" echo "mafft --thread $THREADS --localpair --adjustdirectionaccurately data/to_align/{} data/mafft/{}"
+parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_align.txt" "mafft --thread $THREADS --localpair --adjustdirectionaccurately data/to_align/{} data/mafft/{}"
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_align.txt" CIAlign --infile data/mafft/{} --outfile_stem data/CIAlign/{} --crop_ends --make_consensus --consensus_name {}
 
