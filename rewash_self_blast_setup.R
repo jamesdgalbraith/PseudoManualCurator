@@ -15,7 +15,7 @@ option_list = list(
 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-opt <- list(genome = "seq/Echis_ycKpl.FINAL.fasta")
+
 if (is.null(opt$genome)) {
   stop("Path to genome is needed")
 } else {
