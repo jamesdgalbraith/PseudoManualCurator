@@ -54,8 +54,8 @@ for (i in seq_along(queries$qseqid)) {
 
   self_ranges <- self_out %>%
     group_by(seqnames) %>%
-    filter(qstart >= quantile(qstart, 0.1), # ensure start and end are within 0.1 and 0.9 quantiles
-           qend <= quantile(qend, 0.9)) %>%
+    filter(qstart >= quantile(qstart, 0.05), # ensure start and end are within 0.1 and 0.9 quantiles
+           qend <= quantile(qend, 0.95)) %>%
     dplyr::arrange(-bitscore) %>%
     dplyr::slice(1:5) %>%
     mutate(start = min(qstart), # select extreme start+end

@@ -29,8 +29,8 @@ suppressPackageStartupMessages({
   library(tidyverse)
 })
 
-flank5 = 1500
-flank3 = 1500
+flank5 = 3500
+flank3 = 3500
 
 blast_out <- read_tsv(file = paste0("data/", opt$genome_name, "_rewash_search.out"),
                       col_names = c("qseqid", "seqnames", "pident", "length", "qstart", "qend",
