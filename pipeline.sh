@@ -65,7 +65,7 @@ if [ ! -f "${GENOME}".nsq ]; then
 fi
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/queries.txt blastn -task dc-megablast -query data/split/{} -db $GENOME -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/initial_search/{}.out -num_threads 1 # search genome
- 
+
 cat data/initial_search/clustered_${RM_LIBRARY_NAME}_seq_*.fasta.out > data/${GENOME_NAME}_initial_search.out # compile data
 
 Rscript self_blast_setup.R -g ${GENOME} -l ${RM_LIBRARY} # extend seqs
@@ -76,7 +76,9 @@ parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_self_
 
 Rscript mafft_setup.R -g ${GENOME_NAME} # trim seqs pre-mafft
 
-parallel --env GENOME_NAME --bar --jobs 1 -a data/${GENOME_NAME}"_to_align.txt" "mafft --thread $THREADS --quiet --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}"
+MAFFT_THREADS=$(($THREADS/4))
+
+parallel --env GENOME_NAME --bar --jobs $MAFFT_THREADS -a data/${GENOME_NAME}"_to_align.txt" "mafft --thread 4 --quiet --localpair --adjustdirectionaccurately data/to_align/{} > data/mafft/{}"
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/${GENOME_NAME}"_to_align.txt" CIAlign --infile data/mafft/{} --outfile_stem data/CIAlign/{} --crop_ends --make_consensus --consensus_name {}
 
@@ -87,7 +89,7 @@ Rscript splitter.R -t nt -f data/needs_rewash_${GENOME_NAME} -o data/split/ -p $
 ls data/split/needs_rewash_${GENOME_NAME}* | sed 's/.*\///' > data/rewash_queries_${GENOME_NAME}.txt # list queries
 
 parallel --env GENOME_NAME --bar --jobs ${THREADS} -a data/"rewash_queries_"${GENOME_NAME}".txt" blastn -task dc-megablast -query data/split/{} -db $GENOME -evalue 1e-5 -outfmt \"6 qseqid sseqid pident length qstart qend qlen sstart send slen evalue bitscore\" -out data/initial_search/{}.out -num_threads 1 # search genome
- 
+
 cat data/initial_search/needs_rewash_${GENOME_NAME}_seq_*.fasta.out > data/${GENOME_NAME}_rewash_search.out # compile data
 
 Rscript rewash_self_blast_setup.R -g ${GENOME} -l data/needs_rewash_${GENOME_NAME} # extend seqs

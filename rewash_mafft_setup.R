@@ -43,7 +43,7 @@ for (i in seq_along(queries$qseqid)) {
                        col_names = c("seqnames", "sseqid", "pident", "length", "qstart", "qend",
                                      "qlen", "sstart", "send", "slen", "evalue", "bitscore"), show_col_types = F) %>%
     filter(sseqid != seqnames) %>% # remove self hits
-    filter(!grepl(".*_family-.*#", seqnames)) %>% # remove original consensus (RM)
+    filter(seqnames != sub(" .*", "", names(in_seq)[1])) %>% # remove original consensus (RM)
     filter(sub("#.*", "", seqnames) != queries$qseqid[i]) %>%
     filter(length > 0.5 * BiocGenerics::width(in_seq[1])) # ensure alignment at least 80% of original consensus length
   
